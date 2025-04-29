@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>أنا رائد - الصفحة الرئيسية</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Cairo', sans-serif;
+      background-color: #fefefe;
+      color: #1a1a1a;
+      overflow-x: hidden;
+    }
+
+    header {
+      background-color: #0b2545;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      animation: fadeInDown 1s ease-out;
+    }
+
+    nav {
+      background-color: #0f4c75;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 10px;
+      animation: fadeIn 1.5s ease-in;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: #ffd166;
+    }
+
+    .hero {
+      background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('hero.jpg') no-repeat center center/cover;
+      color: white;
+      text-align: center;
+      padding: 100px 20px;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      animation: slideInRight 1.2s ease-out;
+    }
+
+    .hero p {
+      font-size: 20px;
+      margin-top: 10px;
+      animation: slideInLeft 1.2s ease-out;
+    }
+
+    .cta-button {
+      margin-top: 30px;
+      background-color: #f28c00;
+      color: white;
+      padding: 15px 30px;
+      font-size: 18px;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: transform 0.3s, background-color 0.3s;
+    }
+
+    .cta-button:hover {
+      transform: scale(1.1);
+      background-color: #ffa500;
+    }
+
+    .about {
+      padding: 60px 20px;
+      background-color: #f4f4f4;
+      animation: fadeIn 2s ease-in;
+      text-align: center;
+    }
+
+    .about h2 {
+      color: #0b2545;
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+
+    .about p {
+      font-size: 18px;
+      line-height: 1.8;
+      max-width: 800px;
+      margin: 0 auto 20px;
+    }
+
+    footer {
+      background-color: #0b2545;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      margin-top: 50px;
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(100px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-100px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="images/logo.png" alt="شعار الموقع" style="height: 80px; margin-bottom: 10px;">
+    <h1>برنامج أنا رائد</h1>
+    <p>اكتشاف ورعاية المواهب الرياضية</p>
+  </header>
+
+  <nav>
+    <a href="#">الرئيسية</a>
+    <a href="#about">من نحن</a>
+    <a href="talent.html" target="_blank">نموذج التسجيل</a>
+    <a href="#">المشكلة والحل</a>
+    <a href="#">نموذج العمل</a>
+    <a href="#">المزايا التنافسية</a>
+    <a href="co">تواصل معنا</a>
+  </nav>
+
+  <section class="hero">
+    <h1>اكتشف نجم المستقبل</h1>
+    <p>منصة ذكية لاكتشاف ورعاية المواهب في كافة الرياضات باستخدام أحدث تقنيات الذكاء الاصطناعي</p>
+    <a href="talent.html" class="cta-button">ابدأ الآن</a>
+  </section>
+
+  <section class="about" id="about">
+    <h2>من نحن</h2>
+    <p>نحن فريق مكرّس لاكتشاف المواهب الرياضية وصقلها بأساليب علمية وتقنيات متقدمة. نسعى لتوفير بيئة محفزة تنمي المهارات وتصقل القدرات وتفتح آفاقًا واسعة نحو التميز.</p>
+    <p>من خلال استخدام الذكاء الاصطناعي وتحليل البيانات، نقوم بتقييم الموهبة بدقة وتوجيهها نحو الرياضة الأنسب لها، مع توفير خطط تدريبية مخصصة ودعم متكامل من اكتشاف الموهبة حتى احترافها.</p>
+  </section>
+
+  <footer>
+    &copy; 2025 أنا رائد. جميع الحقوق محفوظة.
+  </footer>
+</body>
+</html>
