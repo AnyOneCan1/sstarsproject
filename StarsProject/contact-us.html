@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تواصل معنا - أنا رائد</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+    body {
+      margin: 0; font-family: 'Cairo', sans-serif; background-color: #fefefe; color: #1a1a1a; overflow-x: hidden;
+    }
+    header {
+      background-color: #0b2545; color: white; padding: 20px; text-align: center;
+    }
+    nav {
+      background-color: #0f4c75; display: flex; justify-content: center; gap: 20px; padding: 10px;
+    }
+    nav a {
+      color: white; text-decoration: none; font-weight: bold; transition: color 0.3s;
+    }
+    nav a:hover, nav a.active {
+      color: #ffd166;
+    }
+    .contact {
+      padding: 60px 20px; background-color: #f4f4f4; text-align: center;
+    }
+    .contact h2 {
+      color: #0b2545; font-size: 36px; margin-bottom: 10px;
+    }
+    .contact p {
+      font-size: 18px; margin-bottom: 30px;
+    }
+    form {
+      max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block; margin-bottom: 5px; font-weight: bold;
+    }
+    input, textarea {
+      width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 5px; border: 1px solid #ccc;
+    }
+    button {
+      background-color: #f28c00; color: white; padding: 12px 20px; border: none; cursor: pointer; border-radius: 6px; font-size: 16px;
+    }
+    button:hover {
+      background-color: #ffa500;
+    }
+    footer {
+      background-color: #0b2545; color: white; text-align: center; padding: 15px; margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="images/logo.png" alt="شعار الموقع" style="height: 80px; margin-bottom: 10px;">
+    <h1>برنامج أنا رائد</h1>
+    <p>اكتشاف ورعاية المواهب الرياضية</p>
+  </header>
+
+  <nav>
+    <a href="index.html">الرئيسية</a>
+    <a href="index.html#about">من نحن</a>
+    <a href="talent.html" target="_blank">نموذج التسجيل</a>
+    <a href="#" onclick="location.href='index.html#';">المشكلة والحل</a>
+    <a href="#" onclick="location.href='index.html#';">نموذج العمل</a>
+    <a href="#" onclick="location.href='index.html#';">المزايا التنافسية</a>
+    <a href="contact.html" class="active">تواصل معنا</a>
+  </nav>
+
+  <section class="contact" id="contact">
+    <h2>تواصل معنا</h2>
+    <p>لأي استفسار أو تعاون، يرجى ملء النموذج التالي وسنعاود الاتصال بك قريبًا.</p>
+    <form action="#" method="post">
+      <label for="fullName">الاسم الكامل</label>
+      <input type="text" id="fullName" name="fullName" required>
+
+      <label for="email">البريد الإلكتروني</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="subject">الموضوع</label>
+      <input type="text" id="subject" name="subject" required>
+
+      <label for="message">الرسالة</label>
+      <textarea id="message" name="message" rows="5" placeholder="اكتب رسالتك هنا..." required></textarea>
+
+      <button type="submit">إرسال</button>
+    </form>
+  </section>
+
+  <footer>
+    &copy; 2025 نجوم المستقبل. جميع الحقوق محفوظة.
+  </footer>
+</body>
+</html>
