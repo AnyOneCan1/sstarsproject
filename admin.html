@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم - إدارة المواهب</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+    body { font-family:'Cairo',sans-serif; margin:0; padding:20px; background:#f4f7fc; }
+    header { background:#0b2545; color:#fff; padding:15px; text-align:center; }
+    .table-container { overflow-x:auto; margin-top:20px; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { padding:10px; border:1px solid #ccc; text-align:center; }
+    th { background:#0f4c75; color:#fff; }
+    tr:nth-child(even) { background:#eef2f7; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>لوحة التحكم - إدارة المواهب</h1>
+  </header>
+
+  <div class="table-container">
+    <table id="submissionsTable">
+      <thead>
+        <tr>
+          <th>الاسم</th>
+          <th>البريد الإلكتروني</th>
+          <th>العمر</th>
+          <th>الموهبة</th>
+          <th>الطول</th>
+          <th>الوزن</th>
+          <th>التقييم</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- البيانات ستُملأ هنا ديناميكيًا -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // رابط Web App لنقطة النهاية التي تُرجع البيانات كاملة بصيغة JSON
+    const SHEET_GET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyzUrGRF4lDc0xVVWk1CKUWKk5Bg0fmGUXMQjlzqMQFC8OSs_9t99GSzqO0SgQsKwlT/exec?mode=get';
+
+    async function loadSubmissions() {
+      try {
+        // جلب البيانات من Google Apps Script
+        const response = await fetch(SHEET_GET_ENDPOINT);
+        const rows = await response.json(); // توقع مصفوفة من الكائنات
+
+        const tbody = document.querySelector('#submissionsTable tbody');
+        // مسح أي بيانات سابقة
+        tbody.innerHTML = '';
+
+        rows.forEach(row => {
+          const tr = document.createElement('tr');
+          // بناء كل خلية
+          ['name','email','age','talent','height','weight','answers'].forEach(key => {
+            const td = document.createElement('td');
+            // إذا كان 'answers' نحولها إلى نص مقروء
+            td.innerText = key === 'answers' ? JSON.stringify(row[key]) : row[key];
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error('خطأ في جلب البيانات:', err);
+      }
+    }
+
+    // تحميل البيانات عند تحمّل الصفحة
+    window.addEventListener('DOMContentLoaded', loadSubmissions);
+  </script>
+</body>
+</html>
