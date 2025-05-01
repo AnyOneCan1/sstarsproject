@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>لوحة التحكم - إدارة المواهب</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
@@ -13,13 +13,20 @@
     th, td { padding:10px; border:1px solid #ccc; text-align:center; }
     th { background:#0f4c75; color:#fff; }
     tr:nth-child(even) { background:#eef2f7; }
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); align-items:center; justify-content:center; }
+    .modal-content { background:#fff; padding:20px; border-radius:8px; width:90%; max-width:600px; }
+    .modal-content h2 { margin-top:0; }
+    .modal-content label { font-weight:bold; display:block; margin-top:10px; }
+    .modal-content input, .modal-content textarea { width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:4px; }
+    .modal-content button { margin-top:15px; padding:10px 20px; border:none; border-radius:6px; background:#f28c00; color:#fff; cursor:pointer; }
+    .modal-content .close-btn { background:#aaa; margin-left:10px; }
+    .answer-field { margin-bottom:15px; }
   </style>
 </head>
 <body>
   <header>
     <h1>لوحة التحكم - إدارة المواهب</h1>
   </header>
-
   <div class="table-container">
     <table id="submissionsTable">
       <thead>
@@ -30,46 +37,146 @@
           <th>الموهبة</th>
           <th>الطول</th>
           <th>الوزن</th>
-          <th>التقييم</th>
         </tr>
       </thead>
-      <tbody>
-        <!-- البيانات ستُملأ هنا ديناميكيًا -->
-      </tbody>
+      <tbody></tbody>
     </table>
   </div>
 
+  <!-- نافذة التفاصيل والتحرير -->
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <h2>تفاصيل المستخدم</h2>
+      <form id="detailForm">
+        <label for="detailName">الاسم</label>
+        <input type="text" id="detailName" name="name" />
+
+        <label for="detailEmail">البريد الإلكتروني</label>
+        <input type="email" id="detailEmail" name="email" readonly />
+
+        <label for="detailTalent">الموهبة</label>
+        <input type="text" id="detailTalent" name="talent" />
+
+        <label for="detailAge">العمر</label>
+        <input type="number" id="detailAge" name="age" />
+
+        <label for="detailHeight">الطول (سم)</label>
+        <input type="number" id="detailHeight" name="height" />
+
+        <label for="detailWeight">الوزن (كجم)</label>
+        <input type="number" id="detailWeight" name="weight" />
+
+        <!-- حاوية لأسئلة التقييم المنفصلة -->
+        <div id="answersContainer"></div>
+
+        <div style="text-align:right;">
+          <button type="button" class="close-btn" id="closeDetail">إلغاء</button>
+          <button type="submit" id="saveDetail">حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
-    // رابط Web App لنقطة النهاية التي تُرجع البيانات كاملة بصيغة JSON
-    const SHEET_GET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyzUrGRF4lDc0xVVWk1CKUWKk5Bg0fmGUXMQjlzqMQFC8OSs_9t99GSzqO0SgQsKwlT/exec?mode=get';
+    const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyzUrGRF4lDc0xVVWk1CKUWKk5Bg0fmGUXMQjlzqMQFC8OSs_9t99GSzqO0SgQsKwlT/exec';
+    const CALLBACK = 'renderTable';
+    let currentEmail = null;
 
-    async function loadSubmissions() {
-      try {
-        // جلب البيانات من Google Apps Script
-        const response = await fetch(SHEET_GET_ENDPOINT);
-        const rows = await response.json(); // توقع مصفوفة من الكائنات
-
+    function loadSubmissions() {
+      const old = document.getElementById('jsonpLoader');
+      if (old) old.remove();
+      window[CALLBACK] = rows => {
         const tbody = document.querySelector('#submissionsTable tbody');
-        // مسح أي بيانات سابقة
         tbody.innerHTML = '';
-
         rows.forEach(row => {
           const tr = document.createElement('tr');
-          // بناء كل خلية
-          ['name','email','age','talent','height','weight','answers'].forEach(key => {
+          const tdName = document.createElement('td');
+          tdName.innerText = row.name;
+          tdName.style.cursor = 'pointer';
+          tdName.onclick = () => openModal(row);
+          tr.appendChild(tdName);
+          ['email','age','talent','height','weight'].forEach(k => {
             const td = document.createElement('td');
-            // إذا كان 'answers' نحولها إلى نص مقروء
-            td.innerText = key === 'answers' ? JSON.stringify(row[key]) : row[key];
+            td.innerText = row[k];
             tr.appendChild(td);
           });
           tbody.appendChild(tr);
         });
-      } catch (err) {
-        console.error('خطأ في جلب البيانات:', err);
-      }
+      };
+      const s = document.createElement('script');
+      s.id = 'jsonpLoader';
+      s.src = `${WEBAPP_URL}?mode=get&callback=${CALLBACK}`;
+      s.onerror = () => console.error('فشل تحميل البيانات عبر JSONP');
+      document.body.appendChild(s);
     }
 
-    // تحميل البيانات عند تحمّل الصفحة
+    function openModal(data) {
+      currentEmail = data.email;
+      document.getElementById('detailName').value = data.name;
+      document.getElementById('detailEmail').value = data.email;
+      document.getElementById('detailTalent').value = data.talent;
+      document.getElementById('detailAge').value = data.age;
+      document.getElementById('detailHeight').value = data.height;
+      document.getElementById('detailWeight').value = data.weight;
+
+      const container = document.getElementById('answersContainer');
+      container.innerHTML = '';
+      let answers = {};
+      let raw = data.answers;
+      try {
+        answers = JSON.parse(raw);
+      } catch {
+        raw = raw.replace(/^"|"$/g, '');
+        raw = raw.replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+        try { answers = JSON.parse(raw); } catch(e) { console.error('فشل تحليل الإجابات:', e); return; }
+      }
+      Object.entries(answers).forEach(([key, value]) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'answer-field';
+        const label = document.createElement('label');
+        label.innerText = `السؤال ${key}`;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = key;
+        input.value = value;
+        wrapper.appendChild(label);
+        wrapper.appendChild(input);
+        container.appendChild(wrapper);
+      });
+
+      document.getElementById('detailModal').style.display = 'flex';
+    }
+
+    document.getElementById('closeDetail').onclick = () => {
+      document.getElementById('detailModal').style.display = 'none';
+    };
+
+    document.getElementById('detailForm').onsubmit = async e => {
+      e.preventDefault();
+      const form = e.target;
+      const updatedAnswers = {};
+      document.querySelectorAll('.answer-field input').forEach(inp => {
+        updatedAnswers[inp.name] = inp.value;
+      });
+      const payload = {
+        mode: 'update',
+        emailKey: currentEmail,
+        name: form.name.value,
+        talent: form.talent.value,
+        age: +form.age.value,
+        height: +form.height.value,
+        weight: +form.weight.value,
+        answers: updatedAnswers
+      };
+      await fetch(WEBAPP_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      document.getElementById('detailModal').style.display = 'none';
+      loadSubmissions();
+    };
+
     window.addEventListener('DOMContentLoaded', loadSubmissions);
   </script>
 </body>

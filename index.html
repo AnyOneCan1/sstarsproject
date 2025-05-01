@@ -14,7 +14,6 @@
       color: #1a1a1a;
       overflow-x: hidden;
     }
-
     header {
       background-color: #0b2545;
       color: white;
@@ -22,7 +21,6 @@
       text-align: center;
       animation: fadeInDown 1s ease-out;
     }
-
     nav {
       background-color: #0f4c75;
       display: flex;
@@ -31,18 +29,15 @@
       padding: 10px;
       animation: fadeIn 1.5s ease-in;
     }
-
     nav a {
       color: white;
       text-decoration: none;
       font-weight: bold;
       transition: color 0.3s;
     }
-
     nav a:hover {
       color: #ffd166;
     }
-
     .hero {
       background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('hero.jpg') no-repeat center center/cover;
       color: white;
@@ -50,18 +45,15 @@
       padding: 100px 20px;
       animation: fadeIn 2s ease-in-out;
     }
-
     .hero h1 {
       font-size: 48px;
       animation: slideInRight 1.2s ease-out;
     }
-
     .hero p {
       font-size: 20px;
       margin-top: 10px;
       animation: slideInLeft 1.2s ease-out;
     }
-
     .cta-button {
       margin-top: 30px;
       background-color: #f28c00;
@@ -73,32 +65,69 @@
       border-radius: 8px;
       transition: transform 0.3s, background-color 0.3s;
     }
-
     .cta-button:hover {
       transform: scale(1.1);
       background-color: #ffa500;
     }
-
+    
     .about {
       padding: 60px 20px;
       background-color: #f4f4f4;
       animation: fadeIn 2s ease-in;
       text-align: center;
     }
-
     .about h2 {
       color: #0b2545;
       font-size: 36px;
       margin-bottom: 20px;
     }
-
     .about p {
       font-size: 18px;
       line-height: 1.8;
       max-width: 800px;
       margin: 0 auto 20px;
     }
-
+    .faq {
+      padding: 40px 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .faq h2 {
+      color: #0b2545;
+      font-size: 32px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .faq-item {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+      cursor: pointer;
+    }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-question {
+      font-weight: bold;
+      position: relative;
+      padding-right: 20px;
+    }
+    .faq-question::after {
+      content: '+';
+      position: absolute;
+      right: 0;
+      font-size: 20px;
+    }
+    .faq-answer {
+      display: none;
+      margin-top: 8px;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+    }
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+    .faq-item.open .faq-question::after {
+      content: '-';
+    }
     footer {
       background-color: #0b2545;
       color: white;
@@ -106,22 +135,18 @@
       padding: 15px;
       margin-top: 50px;
     }
-
     @keyframes fadeInDown {
       from { opacity: 0; transform: translateY(-30px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
-
     @keyframes slideInRight {
       from { opacity: 0; transform: translateX(100px); }
       to { opacity: 1; transform: translateX(0); }
     }
-
     @keyframes slideInLeft {
       from { opacity: 0; transform: translateX(-100px); }
       to { opacity: 1; transform: translateX(0); }
@@ -130,7 +155,7 @@
 </head>
 <body>
   <header>
-    <img src="images/logo.png" alt="شعار الموقع" style="height: 80px; margin-bottom: 10px;">
+    <img src="images/logo.png" alt="شعار الموقع" style="height: 80px; margin-bottom: 10px;"  > <!--align="right" i am not sure if i will need it to be in the right-->
     <h1>برنامج أنا رائد</h1>
     <p>اكتشاف ورعاية المواهب الرياضية</p>
   </header>
@@ -138,14 +163,7 @@
   <nav>
     <a href="#">الرئيسية</a>
     <a href="#about">من نحن</a>
-    <a href="talent.html" target="_blank">نموذج التسجيل</a>
-    
-    <!--
-    <a href="#">المشكلة والحل</a>
-    <a href="#">نموذج العمل</a>
-    <a href="#">المزايا التنافسية</a>
-    -->
-
+    <a href="talent.html">ابدأ الآن</a>
     <a href="contact-us.html">تواصل معنا</a>
   </nav>
 
@@ -161,8 +179,38 @@
     <p>من خلال استخدام الذكاء الاصطناعي وتحليل البيانات، نقوم بتقييم الموهبة بدقة وتوجيهها نحو الرياضة الأنسب لها، مع توفير خطط تدريبية مخصصة ودعم متكامل من اكتشاف الموهبة حتى احترافها.</p>
   </section>
 
+  <!-- قسم الأسئلة الشائعة -->
+  <section class="faq">
+    <h2>الأسئلة الشائعة</h2>
+    <div class="faq-item">
+      <div class="faq-question">كيف يمكنني التسجيل في المنصة؟</div>
+      <div class="faq-answer">يمكنك التسجيل عن طريق الضغط على زر "ابدأ الآن" وملء نموذج التسجيل بالمعلومات المطلوبة.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">هل التسجيل مجاني؟</div>
+      <div class="faq-answer">نعم، التسجيل واستخدام المنصة مجاني بالكامل لجميع المستخدمين.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">كيف يتم تقييم المواهب؟</div>
+      <div class="faq-answer">نستخدم مزيجاً من تحليلات البيانات والذكاء الاصطناعي لتقييم الأداء والمهارات وتوجيه المواهب للأفضل.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">ما هي الرياضات المدعومة؟</div>
+      <div class="faq-answer">ندعم جميع أنواع الرياضات من كرة القدم لكرة السلة والسباحة والجري وغيرها.</div>
+    </div>
+
+  </section>
+
   <footer>
     &copy; 2025 أنا رائد. جميع الحقوق محفوظة.
   </footer>
+
+  <script>
+    document.querySelectorAll('.faq-item').forEach(item => {
+      item.addEventListener('click', () => {
+        item.classList.toggle('open');
+      });
+    });
+  </script>
 </body>
 </html>
