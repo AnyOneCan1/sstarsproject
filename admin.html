@@ -13,13 +13,32 @@
     th, td { padding:10px; border:1px solid #ccc; text-align:center; }
     th { background:#0f4c75; color:#fff; }
     tr:nth-child(even) { background:#eef2f7; }
+
+    /* Modal */
     .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); align-items:center; justify-content:center; }
-    .modal-content { background:#fff; padding:20px; border-radius:8px; width:90%; max-width:600px; }
+    .modal-content { background:#fff; padding:20px; border-radius:8px; width:90%; max-width:700px; max-height:90vh; overflow-y:auto; }
     .modal-content h2 { margin-top:0; }
     .modal-content label { font-weight:bold; display:block; margin-top:10px; }
     .modal-content input, .modal-content textarea { width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:4px; }
     .modal-content button { margin-top:15px; padding:10px 20px; border:none; border-radius:6px; background:#f28c00; color:#fff; cursor:pointer; }
     .modal-content .close-btn { background:#aaa; margin-left:10px; }
+
+    /* Conversation bubbles */
+    #conversationContainer {
+      margin:20px 0;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .conv-message {
+      max-width:75%;
+      padding:10px 15px;
+      border-radius:12px;
+      word-wrap:break-word;
+    }
+    .conv-assistant { background:#e0e0e0; align-self:flex-start; }
+    .conv-user      { background:#cfe9ff; align-self:flex-end; }
+
     .answer-field { margin-bottom:15px; }
   </style>
 </head>
@@ -31,19 +50,14 @@
     <table id="submissionsTable">
       <thead>
         <tr>
-          <th>الاسم</th>
-          <th>البريد الإلكتروني</th>
-          <th>العمر</th>
-          <th>الموهبة</th>
-          <th>الطول</th>
-          <th>الوزن</th>
+          <th>الاسم</th><th>البريد الإلكتروني</th><th>العمر</th><th>الموهبة</th><th>الطول</th><th>الوزن</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
   </div>
 
-  <!-- نافذة التفاصيل والتحرير -->
+  <!-- Detail Modal -->
   <div id="detailModal" class="modal">
     <div class="modal-content">
       <h2>تفاصيل المستخدم</h2>
@@ -66,117 +80,142 @@
         <label for="detailWeight">الوزن (كجم)</label>
         <input type="number" id="detailWeight" name="weight" />
 
-        <!-- حاوية لأسئلة التقييم المنفصلة -->
+        <h3>المحادثة</h3>
+        <div id="conversationContainer"></div>
+
+        <h3>الإجابات القابلة للتعديل</h3>
         <div id="answersContainer"></div>
 
         <div style="text-align:right;">
-          <button type="button" class="close-btn" id="closeDetail">إلغاء</button>
           <button type="submit" id="saveDetail">حفظ</button>
+          <button type="button" class="close-btn" id="closeDetail">إلغاء</button>
+          <button
+            type="button"
+            id="replyBtn"
+            style="background:#007bff; margin-left:8px;"
+          >رد عبر الإيميل</button>
         </div>
+        
       </form>
     </div>
   </div>
 
   <script>
     const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyzUrGRF4lDc0xVVWk1CKUWKk5Bg0fmGUXMQjlzqMQFC8OSs_9t99GSzqO0SgQsKwlT/exec';
-    const CALLBACK = 'renderTable';
+    const CALLBACK   = 'renderTable';
     let currentEmail = null;
-
+  
     function loadSubmissions() {
+      // remove old JSONP tag
       const old = document.getElementById('jsonpLoader');
       if (old) old.remove();
+  
+      // callback invoked by JSONP
       window[CALLBACK] = rows => {
         const tbody = document.querySelector('#submissionsTable tbody');
         tbody.innerHTML = '';
         rows.forEach(row => {
           const tr = document.createElement('tr');
-          const tdName = document.createElement('td');
-          tdName.innerText = row.name;
-          tdName.style.cursor = 'pointer';
-          tdName.onclick = () => openModal(row);
-          tr.appendChild(tdName);
-          ['email','age','talent','height','weight'].forEach(k => {
+          ['name','email','age','talent','height','weight'].forEach(k => {
             const td = document.createElement('td');
             td.innerText = row[k];
+            if (k === 'name') {
+              td.style.cursor = 'pointer';
+              td.onclick = () => openModal(row);
+            }
             tr.appendChild(td);
           });
           tbody.appendChild(tr);
         });
       };
-      const s = document.createElement('script');
-      s.id = 'jsonpLoader';
-      s.src = `${WEBAPP_URL}?mode=get&callback=${CALLBACK}`;
-      s.onerror = () => console.error('فشل تحميل البيانات عبر JSONP');
-      document.body.appendChild(s);
+  
+      // add cache-busting timestamp
+      const script = document.createElement('script');
+      script.id = 'jsonpLoader';
+      script.src = `${WEBAPP_URL}?mode=get&callback=${CALLBACK}&cb=${Date.now()}`;
+      script.onerror = () => console.error('فشل تحميل البيانات عبر JSONP');
+      document.body.appendChild(script);
     }
-
-    function openModal(data) {
+  
+    async function openModal(data) {
       currentEmail = data.email;
-      document.getElementById('detailName').value = data.name;
-      document.getElementById('detailEmail').value = data.email;
+      document.getElementById('detailName').value   = data.name;
+      document.getElementById('detailEmail').value  = data.email;
       document.getElementById('detailTalent').value = data.talent;
-      document.getElementById('detailAge').value = data.age;
+      document.getElementById('detailAge').value    = data.age;
       document.getElementById('detailHeight').value = data.height;
       document.getElementById('detailWeight').value = data.weight;
-
-      const container = document.getElementById('answersContainer');
-      container.innerHTML = '';
-      let answers = {};
-      let raw = data.answers;
-      try {
-        answers = JSON.parse(raw);
-      } catch {
-        raw = raw.replace(/^"|"$/g, '');
-        raw = raw.replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-        try { answers = JSON.parse(raw); } catch(e) { console.error('فشل تحليل الإجابات:', e); return; }
-      }
-      Object.entries(answers).forEach(([key, value]) => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'answer-field';
-        const label = document.createElement('label');
-        label.innerText = `السؤال ${key}`;
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = key;
-        input.value = value;
-        wrapper.appendChild(label);
-        wrapper.appendChild(input);
-        container.appendChild(wrapper);
+  
+      // render conversation
+      const conv = document.getElementById('conversationContainer');
+      conv.innerHTML = '';
+      let chat = [];
+      try { chat = JSON.parse(data.answers); } catch(e){ console.error(e) }
+      chat.forEach(item => {
+        const msg = document.createElement('div');
+        msg.className = 'conv-message ' + (item.role==='user'?'conv-user':'conv-assistant');
+        msg.innerText = item.text;
+        conv.appendChild(msg);
       });
-
+  
+      // render editable answers
+      const ansCont = document.getElementById('answersContainer');
+      ansCont.innerHTML = '';
+      if (data.answersEditable) {
+        let edt = {};
+        try { edt = JSON.parse(data.answersEditable); } catch {}
+        Object.entries(edt).forEach(([q,a]) => {
+          const w = document.createElement('div'); w.className='answer-field';
+          const lbl = document.createElement('label'); lbl.innerText = q;
+          const inp = document.createElement('textarea'); inp.name=q; inp.value=a;
+          w.appendChild(lbl); w.appendChild(inp); ansCont.appendChild(w);
+        });
+      }
+  
       document.getElementById('detailModal').style.display = 'flex';
     }
-
+  
     document.getElementById('closeDetail').onclick = () => {
       document.getElementById('detailModal').style.display = 'none';
     };
-
+  
     document.getElementById('detailForm').onsubmit = async e => {
       e.preventDefault();
-      const form = e.target;
-      const updatedAnswers = {};
-      document.querySelectorAll('.answer-field input').forEach(inp => {
-        updatedAnswers[inp.name] = inp.value;
+      const f = e.target;
+      const upd = {};
+      document.querySelectorAll('#answersContainer .answer-field textarea').forEach(inp => {
+        upd[inp.name] = inp.value;
       });
       const payload = {
         mode: 'update',
         emailKey: currentEmail,
-        name: form.name.value,
-        talent: form.talent.value,
-        age: +form.age.value,
-        height: +form.height.value,
-        weight: +form.weight.value,
-        answers: updatedAnswers
+        name: f.name.value,
+        talent: f.talent.value,
+        age: +f.age.value,
+        height: +f.height.value,
+        weight: +f.weight.value,
+        answersEditable: Object.keys(upd).length ? upd : undefined
       };
       await fetch(WEBAPP_URL, {
-        method: 'POST', mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type':'application/json' },
         body: JSON.stringify(payload)
       });
       document.getElementById('detailModal').style.display = 'none';
+  
+      // reload table—our cache-buster makes sure you see the new values
       loadSubmissions();
     };
-
+  
+    // reply via Gmail
+    document.getElementById('replyBtn').onclick = () => {
+      const to      = encodeURIComponent(currentEmail);
+      const subject = encodeURIComponent('رد على استبيان');
+      const url     = `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}`;
+      window.open(url, '_blank');
+    };
+  
     window.addEventListener('DOMContentLoaded', loadSubmissions);
   </script>
 </body>

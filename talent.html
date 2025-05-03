@@ -6,27 +6,41 @@
   <title>نموذج تسجيل الموهبة</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-    body { font-family: 'Cairo', sans-serif; background: #f0f8ff; margin:0; padding:0; }
-    header { background: #0b2545; color: #fff; padding:20px; text-align:center; }
+    body { font-family:'Cairo',sans-serif; background:#f0f8ff; margin:0; padding:0; }
+    header { background:#0b2545; color:#fff; padding:20px; text-align:center; }
     nav { background:#0f4c75; padding:10px; display:flex; justify-content:center; gap:15px; }
     nav a { color:#fff; text-decoration:none; font-weight:bold; }
     .container { max-width:600px; margin:40px auto; background:#fff; padding:30px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
     label { display:block; margin-bottom:6px; font-weight:bold; }
-    input, select, textarea, button { width:100%; padding:10px; margin-bottom:20px; border-radius:5px; border:1px solid #ccc; }
-    button { background:#f28c00; color:#fff; border:none; cursor:pointer; font-size:16px; }
+    input, select, textarea, button { width:100%; padding:10px; margin-bottom:20px; border-radius:5px; border:1px solid #ccc; font-size:16px; box-sizing:border-box; }
+    button { background:#f28c00; color:#fff; border:none; cursor:pointer; }
     button:hover { background:#ffa500; }
     .hidden { display:none; }
     .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; }
     .modal-content { background:#fff; padding:20px; border-radius:8px; text-align:center; max-width:300px; width:90%; }
     .modal-content button { margin-top:15px; }
-    #questionSection { margin-top:20px; }
-    #questionSection label { margin-top:15px; }
+
+    /* AI-Chat styles */
+    #cooldownNotice { background:#fff3cd; color:#856404; border:1px solid #ffeeba; padding:10px; border-radius:5px; margin-bottom:20px; text-align:center; }
+    #loading { position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.7); color:#fff; padding:5px 10px; border-radius:5px; font-size:.9em; }
+    #aiContainer { background:#fff; padding:30px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); margin-top:20px; }
+    #progress { font-size:1em; margin-bottom:10px; text-align:center; color:#333; }
+    #chat { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+    .message { max-width:75%; padding:10px 15px; border-radius:12px; word-wrap:break-word; }
+    .assistant { background:#e0e0e0; align-self:flex-start; }
+    .user      { background:#cfe9ff; align-self:flex-end; }
+    #answer { height:80px; }
+    #wordCounter { font-size:.9em; color:#555; margin-top:-10px; margin-bottom:15px; text-align:left; }
+    #submit, #restart, #homeBtn { width:auto; padding:8px 16px; margin-right:10px; }
+    #restart { background:#007bff; color:#fff; }
+    #homeBtn  { background:#28a745; color:#fff; }
+    #restart:hover:not(:disabled){ background:#0056b3 }
+    #homeBtn:hover:not(:disabled) { background:#218838; }
+    #restart:disabled, #homeBtn:disabled { background:#ccc; cursor:default; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>نموذج تسجيل الموهبة</h1>
-  </header>
+  <header><h1>نموذج تسجيل الموهبة</h1></header>
   <nav>
     <a href="index.html">الرئيسية</a>
     <a href="index.html#about">من نحن</a>
@@ -34,6 +48,10 @@
   </nav>
 
   <div class="container">
+    <!-- إشعار 24 ساعة -->
+    <div id="cooldownNotice" class="hidden"></div>
+
+    <!-- نموذج البيانات الأولي -->
     <form id="talentForm">
       <label for="name">الاسم الكامل</label>
       <input type="text" id="name" name="name" required />
@@ -47,14 +65,15 @@
       <label for="talent">الموهبة</label>
       <select id="talent" name="talent">
         <option value="">-- اختر الموهبة --</option>
-        <option value="football">كرة القدم</option>
-        <option value="basketball">كرة السلة</option>
-        <option value="swimming">السباحة</option>
-        <option value="running">الجري</option>
-        <option value="volleyball">كرة الطائرة</option>
-        <option value="other">أخرى</option>
+        <option>كرة القدم</option>
+        <option>كرة السلة</option>
+        <option>السباحة</option>
+        <option>الجري</option>
+        <option>كرة الطائرة</option>
+        <option>لا أعلم</option>
+        <option>أخرى</option>
       </select>
-      <input type="text" id="otherTalent" name="otherTalent" placeholder="اكتب هويتك هنا" class="hidden" />
+      <input type="text" id="otherTalent" name="otherTalent" placeholder="اكتب الموهبة هنا" class="hidden" />
 
       <label for="height">الطول (سم)</label>
       <input type="number" id="height" name="height" required />
@@ -62,12 +81,27 @@
       <label for="weight">الوزن (كجم)</label>
       <input type="number" id="weight" name="weight" required />
 
+      <div id="goalField">
+        <label for="goal">ما هو هدفك الرياضي؟</label>
+        <textarea id="goal" name="goal" rows="3" placeholder="اكتب بإيجاز عن طموحك..." required></textarea>
+      </div>
+
       <button type="submit">إرسال</button>
     </form>
 
-    <div id="questionSection" class="hidden">
-      <h2>أسئلة إضافية</h2>
-      <form id="questionsForm"></form>
+    <!-- واجهة الأسئلة/الإجابات -->
+    <div id="aiContainer" class="hidden">
+      <div id="loading" class="hidden">جاري المعالجة…</div>
+      <div id="progress" class="hidden"></div>
+      <div id="chat"></div>
+
+      <label for="answer">أجب هنا (50 كلمة كحد أقصى):</label>
+      <textarea id="answer" placeholder="اكتب إجابتك..." required></textarea>
+      <div id="wordCounter">0 / 50 كلمات</div>
+
+      <button id="submit">إرسال الإجابة</button>
+      <button id="restart" class="hidden">إعادة البدء</button>
+      <button id="homeBtn"  class="hidden">العودة للرئيسية</button>
     </div>
   </div>
 
@@ -78,96 +112,6 @@
     </div>
   </div>
 
-  <script>
-    const SHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyzUrGRF4lDc0xVVWk1CKUWKk5Bg0fmGUXMQjlzqMQFC8OSs_9t99GSzqO0SgQsKwlT/exec';
-
-    async function init() {
-      let talentQuestions = {};
-      try {
-        const resp = await fetch('talentQuestions.json');
-        talentQuestions = await resp.json();
-      } catch (e) {
-        console.error('فشل تحميل JSON:', e);
-      }
-
-      const talentSel = document.getElementById('talent');
-      const otherInp = document.getElementById('otherTalent');
-      const baseForm = document.getElementById('talentForm');
-      const qSection = document.getElementById('questionSection');
-      const qForm = document.getElementById('questionsForm');
-
-      talentSel.addEventListener('change', e => {
-        if (e.target.value === 'other') {
-          otherInp.classList.remove('hidden');
-          otherInp.required = true;
-        } else {
-          otherInp.classList.add('hidden');
-          otherInp.required = false;
-        }
-      });
-
-      baseForm.addEventListener('submit', e => {
-        e.preventDefault();
-        const rawTalent = talentSel.value;
-        const talentVal = rawTalent === 'other' ? otherInp.value.trim() : rawTalent;
-        if (!talentVal) return alert('يرجى اختيار الموهبة أو كتابتها');
-
-        baseForm.classList.add('hidden');
-        qSection.classList.remove('hidden');
-        qForm.innerHTML = '';
-
-        const qs = talentQuestions[talentVal] || talentQuestions['other'] || [];
-        qs.forEach(qText => {
-          const lbl = document.createElement('label');
-          lbl.innerText = qText;
-          const inp = document.createElement('input');
-          inp.type = 'text';
-          // استخدم نص السؤال كمفتاح
-          inp.name = qText;
-          inp.required = true;
-          qForm.appendChild(lbl);
-          qForm.appendChild(inp);
-        });
-
-        const btn = document.createElement('button');
-        btn.type = 'submit';
-        btn.innerText = 'إرسال التقييم';
-        qForm.appendChild(btn);
-
-        qForm.onsubmit = async ev => {
-          ev.preventDefault();
-          const fd = new FormData(qForm);
-          const answers = {};
-          for (let [key, val] of fd.entries()) answers[key] = val;
-
-          const payload = {
-            name: baseForm.name.value,
-            email: baseForm.email.value,
-            age: baseForm.age.value,
-            talent: talentVal,
-            height: baseForm.height.value,
-            weight: baseForm.weight.value,
-            answers
-          };
-
-          fetch(SHEET_ENDPOINT, {
-            method: 'POST', mode: 'no-cors',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(payload)
-          }).catch(console.error);
-
-          qSection.classList.add('hidden');
-          document.getElementById('successModal').style.display = 'flex';
-        };
-      });
-
-      document.getElementById('closeModal').onclick = () => {
-        document.getElementById('successModal').style.display = 'none';
-        location.reload();
-      };
-    }
-
-    window.addEventListener('DOMContentLoaded', init);
-  </script>
+  <script src="talent.js"></script>
 </body>
 </html>
